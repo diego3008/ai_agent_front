@@ -38,6 +38,12 @@ export default function Home() {
                         className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:border-white w-full"
                         placeholder="Escribe un mensaje..."
                         variant="standard"
+                        sx={{
+                            "& .MuiInputBase-input": {
+                                // Estilo de la entrada
+                                color: "white", // Color de la fuente
+                            },
+                        }}
                     />
                     <Tooltip title="Send" placement="right" arrow>
                         <IconButton

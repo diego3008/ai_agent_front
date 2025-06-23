@@ -2,8 +2,9 @@
 
 import IconButton from "@mui/material/IconButton";
 import { styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpward } from "@mui/icons-material";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import axios from "axios";
 import { QuestionModel } from "./models/question.model";
 
@@ -23,6 +24,8 @@ export default function Home() {
         question_text: "",
     });
     const [response, setResponse] = useState<Array<string>>([]);
+
+    const fileRef = useRef(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const question_text = e.target.value;
@@ -59,9 +62,18 @@ export default function Home() {
         }
     };
 
+    const handleButtonClick = (event: any): any => {
+        fileRef.current.click(); // Disparar el input file oculto
+    };
+
+    const handleFileChange = (e): any => {
+        const file = e.target.files[0];
+        console.log(file);
+    };
+
     return (
         <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center h-screen">
-            <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center h-screen">
+            <div className="container flex flex-col items-center justify-center h-screen">
                 <div>
                     {response.map((resp, index) => (
                         <h1 key={index}>{resp}</h1>
@@ -69,10 +81,10 @@ export default function Home() {
                 </div>
                 <h1 className="text-4xl text-center pb-4">AI Agent</h1>
                 <div
-                    className="h-2/12 w-6/12 messagesBackground border-2 
-                border-gray-600/30 rounded-xl shadow-md mb-8 flex flex-col p-4 overflow-y-auto"
+                    className="lg:h-2/12 lg:w-6/12 messagesBackground border-2 
+                border-gray-600/30 rounded-xl shadow-md flex flex-col pr-2 pl-2 "
                 >
-                    <div className="grid grid-cols-12">
+                    <div className="grid grid-cols-12 lg:mt-4">
                         <input
                             type="text"
                             placeholder="How can I help you today?"
@@ -91,8 +103,8 @@ export default function Home() {
                             <div
                                 className={
                                     prompt.question_text === ""
-                                        ? "rounded-full bg-gray-300 mx-auto mt-4"
-                                        : "rounded-full buttonBackground mx-auto mt-4"
+                                        ? "rounded-full bg-gray-300 mx-auto mt-3"
+                                        : "rounded-full buttonBackground mx-auto mt-3"
                                 }
                             >
                                 <IconButton
@@ -111,6 +123,27 @@ export default function Home() {
                                 </IconButton>
                             </div>
                         </BootstrapTooltip>
+                    </div>
+                    <div className="flex justify-start mb-6">
+                        <BootstrapTooltip title="Upload file" placement="right">
+                            <IconButton
+                                type="button"
+                                onClick={handleButtonClick}
+                            >
+                                <AttachFileIcon
+                                    sx={{
+                                        color: "white",
+                                    }}
+                                />
+                            </IconButton>
+                        </BootstrapTooltip>
+                        <input
+                            type="file"
+                            ref={fileRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept=".py"
+                        />
                     </div>
                 </div>
             </div>

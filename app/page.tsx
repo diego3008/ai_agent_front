@@ -7,6 +7,7 @@ import { ArrowUpward } from "@mui/icons-material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import axios from "axios";
 import { QuestionModel } from "./models/question.model";
+import { Typewriter } from "./components/typewriter";
 
 const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} arrow classes={{ popper: className }} />
@@ -156,7 +157,11 @@ export default function Home() {
                             <div className="flex justify-start">
                                 <div className="bg-gray-700 text-white rounded-lg px-4 py-2 max-w-xs lg:max-w-md">
                                     <p className="text-sm whitespace-pre-wrap">
-                                        {message.response}
+                                        <Typewriter
+                                            text={message.response}
+                                            speed={20}
+                                            className="text-sm"
+                                        />
                                     </p>
                                 </div>
                             </div>
@@ -189,7 +194,17 @@ export default function Home() {
                         <IconButton
                             type="button"
                             onClick={handleButtonClick}
-                            className="text-gray-400 hover:text-white"
+                            sx={{
+                                color: "#60A5FA",
+                                backgroundColor: "rgba(37, 99, 235, 0.2)",
+                                borderRadius: "8px",
+                                padding: "8px",
+                                marginRight: "8px",
+                                "&:hover": {
+                                    color: "#93C5FD",
+                                    backgroundColor: "rgba(37, 99, 235, 0.3)",
+                                },
+                            }}
                         >
                             <AttachFileIcon />
                         </IconButton>
@@ -208,7 +223,7 @@ export default function Home() {
                     <div className="flex-1 relative">
                         <input
                             type="text"
-                            placeholder="How can I help you today?"
+                            placeholder="How can I assist you today?"
                             className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
@@ -232,11 +247,37 @@ export default function Home() {
                                     disabled={
                                         prompt.question_text === "" || isLoading
                                     }
-                                    className={
-                                        prompt.question_text === "" || isLoading
-                                            ? "text-gray-500"
-                                            : "text-blue-500 hover:text-blue-400"
-                                    }
+                                    sx={{
+                                        color:
+                                            prompt.question_text === "" ||
+                                            isLoading
+                                                ? "#6B7280"
+                                                : "#FFFFFF",
+                                        backgroundColor:
+                                            prompt.question_text === "" ||
+                                            isLoading
+                                                ? "rgba(75, 85, 99, 0.2)"
+                                                : "#16A34A",
+                                        borderRadius: "8px",
+                                        padding: "8px",
+                                        "&:hover": {
+                                            color:
+                                                prompt.question_text === "" ||
+                                                isLoading
+                                                    ? "#6B7280"
+                                                    : "#F0FDF4",
+                                            backgroundColor:
+                                                prompt.question_text === "" ||
+                                                isLoading
+                                                    ? "rgba(75, 85, 99, 0.2)"
+                                                    : "#15803D",
+                                        },
+                                        "&.Mui-disabled": {
+                                            color: "#6B7280",
+                                            backgroundColor:
+                                                "rgba(75, 85, 99, 0.2)",
+                                        },
+                                    }}
                                 >
                                     <ArrowUpward fontSize="small" />
                                 </IconButton>

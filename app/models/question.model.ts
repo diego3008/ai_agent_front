@@ -1,3 +1,3 @@
 export class QuestionModel {
-    question_text: string | FormData = "";
+    question_text: string = "";
 }

@@ -33,6 +33,7 @@ export default function Home() {
     });
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
 
     const fileRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -41,19 +42,44 @@ export default function Home() {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // Enhanced handleInputChange for text input only
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const question_text = e.target.value;
+        const value = e.target.value;
+        // Handle text input
         setPrompt((prev) => ({
             ...prev,
-            question_text,
+            question_text: value,
         }));
     };
 
-    const handlePrompt = async (data: QuestionModel): Promise<string> => {
+    // Enhanced handlePrompt to support both text and files
+    const handlePrompt = async (
+        data: QuestionModel,
+        file?: File
+    ): Promise<string> => {
         try {
+            // Create FormData object to handle both text and file
+            const formData = new FormData();
+
+            // Append text data
+            Object.entries(data).forEach(([key, value]) => {
+                formData.append(key, value);
+            });
+
+            // Append file if provided
+            if (file) {
+                formData.append("file", file);
+            }
+
+            // Send request with FormData
             const response = await axios.post(
-                "http://localhost:8000/api/agent/question",
-                data
+                "http://localhost:8000/api/agent/question-form",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
             );
             return response.data;
         } catch (error: any) {
@@ -69,7 +95,8 @@ export default function Home() {
         setIsLoading(true);
 
         try {
-            const result = await handlePrompt(prompt);
+            // Pass both the prompt and file to handlePrompt
+            const result = await handlePrompt(prompt, file || undefined);
             const newMessage: Message = {
                 id: Date.now().toString(),
                 question: currentQuestion,
@@ -79,6 +106,8 @@ export default function Home() {
 
             setMessages((prev) => [...prev, newMessage]);
             setPrompt({ question_text: "" });
+            // Clear the file after submission
+            setFile(null);
         } catch (error) {
             console.error("Error sending prompt:", error);
             // Add error message to chat
@@ -109,8 +138,19 @@ export default function Home() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const file = e.target.files?.[0];
         if (file) {
-            console.log(file);
-            // Handle file upload logic here
+            // Validate file size (10MB limit)
+            if (file.size > 10 * 1024 * 1024) {
+                alert("File size exceeds 10MB limit");
+                // Clear the file input
+                if (fileRef.current) {
+                    fileRef.current.value = "";
+                }
+                return;
+            }
+
+            // Set the file in state
+            setFile(file);
+            console.log("File selected:", file.name);
         }
     };
 
@@ -216,11 +256,29 @@ export default function Home() {
                         ref={fileRef}
                         onChange={handleFileChange}
                         className="hidden"
-                        accept=".py"
+                        accept=".py,.xlsx,.xls,.csv"
                     />
 
                     {/* Text Input */}
                     <div className="flex-1 relative">
+                        {/* File indicator */}
+                        {file && (
+                            <div className="flex items-center text-sm text-blue-400 mb-1">
+                                <span className="truncate max-w-xs">
+                                    File attached: {file.name}
+                                </span>
+                                <BootstrapTooltip title="Remove file" placement="top">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFile(null)}
+                                        className="ml-2 text-gray-400 hover:text-white"
+                                        aria-label="Remove file"
+                                    >
+                                        X
+                                    </button>
+                                </BootstrapTooltip>
+                            </div>
+                        )}
                         <input
                             type="text"
                             placeholder="How can I assist you today?"

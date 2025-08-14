@@ -3,8 +3,12 @@
 import IconButton from "@mui/material/IconButton";
 import { styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import React, { useRef, useState } from "react";
-import { ArrowUpward } from "@mui/icons-material";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
+import {
+    ArrowUpward,
+    AttachFile,
+    Brightness4,
+    Brightness7,
+} from "@mui/icons-material";
 import axios from "axios";
 import { QuestionModel } from "./models/question.model";
 import { Typewriter } from "./components/typewriter";
@@ -34,9 +38,11 @@ export default function Home() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
+    const [darkMode, setDarkMode] = useState(true);
 
-    const fileRef = useRef<HTMLInputElement>(null);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -131,9 +137,13 @@ export default function Home() {
         }
     };
 
+    const fileRef = useRef<HTMLInputElement>(null);
+
     const handleButtonClick = (): void => {
         fileRef.current?.click();
     };
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const file = e.target.files?.[0];
@@ -160,19 +170,51 @@ export default function Home() {
     }, [messages]);
 
     return (
-        <div className="flex flex-col h-screen bg-gray-900">
+        <div
+            className={`flex flex-col h-screen ${
+                darkMode ? "bg-gray-900" : "bg-gray-100"
+            }`}
+        >
             {/* Header */}
-            <div className="flex-shrink-0 p-4 border-b border-gray-700">
-                <h1 className="text-2xl font-bold text-white text-center">
+            <div className="flex-shrink-0 p-4 border-b border-gray-700 flex justify-between items-center">
+                <h1
+                    className={`text-2xl font-bold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                    }`}
+                >
                     AI Agent
                 </h1>
+                <BootstrapTooltip
+                    title={`Switch to ${darkMode ? "light" : "dark"} mode`}
+                    placement="left"
+                >
+                    <IconButton
+                        onClick={toggleDarkMode}
+                        sx={{
+                            color: "#60A5FA",
+                            backgroundColor: "rgba(37, 99, 235, 0.2)",
+                            borderRadius: "8px",
+                            padding: "8px",
+                            "&:hover": {
+                                color: "#93C5FD",
+                                backgroundColor: "rgba(37, 99, 235, 0.3)",
+                            },
+                        }}
+                    >
+                        {darkMode ? <Brightness7 /> : <Brightness4 />}
+                    </IconButton>
+                </BootstrapTooltip>
             </div>
 
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
-                        <div className="text-center text-gray-400">
+                        <div
+                            className={`text-center ${
+                                darkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                        >
                             <h2 className="text-xl font-semibold mb-2">
                                 Welcome to AI Agent
                             </h2>
@@ -246,7 +288,7 @@ export default function Home() {
                                 },
                             }}
                         >
-                            <AttachFileIcon />
+                            <AttachFile />
                         </IconButton>
                     </BootstrapTooltip>
 
@@ -263,15 +305,26 @@ export default function Home() {
                     <div className="flex-1 relative">
                         {/* File indicator */}
                         {file && (
-                            <div className="flex items-center text-sm text-blue-400 mb-1">
+                            <div
+                                className={`flex items-center text-sm mb-1 ${
+                                    darkMode ? "text-blue-400" : "text-blue-600"
+                                }`}
+                            >
                                 <span className="truncate max-w-xs">
                                     File attached: {file.name}
                                 </span>
-                                <BootstrapTooltip title="Remove file" placement="top">
+                                <BootstrapTooltip
+                                    title="Remove file"
+                                    placement="top"
+                                >
                                     <button
                                         type="button"
                                         onClick={() => setFile(null)}
-                                        className="ml-2 text-gray-400 hover:text-white"
+                                        className={`ml-2 ${
+                                            darkMode
+                                                ? "text-gray-400 hover:text-white"
+                                                : "text-gray-500 hover:text-gray-900"
+                                        }`}
                                         aria-label="Remove file"
                                     >
                                         X
@@ -282,7 +335,11 @@ export default function Home() {
                         <input
                             type="text"
                             placeholder="How can I assist you today?"
-                            className="w-full bg-gray-800 text-white rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full rounded-lg px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                darkMode
+                                    ? "bg-gray-800 text-white"
+                                    : "bg-white text-gray-900 border border-gray-300"
+                            }`}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
                             value={prompt.question_text}
